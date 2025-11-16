@@ -19,3 +19,7 @@ If you are developing a production application, we recommend using TypeScript wi
 **Hafta (9 Kasım 2025):**
 Vize haftası nedeniyle Faz 2 kodlamasına ara verildi. 
 Bu haftalık zorunlu commit, proje planlaması olarak atılmaktadır.
+
+**Hafta (16 Kasım 2025):**
+Vize haftası devam ettiği için bu hafta da projeye ara verilmiştir.
+Zorunlu haftalık commit atandı.
