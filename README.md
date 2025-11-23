@@ -23,3 +23,9 @@ Bu haftalık zorunlu commit, proje planlaması olarak atılmaktadır.
 **Hafta (16 Kasım 2025):**
 Vize haftası devam ettiği için bu hafta da projeye ara verilmiştir.
 Zorunlu haftalık commit atandı.
+
+
+**Hafta (23 Kasım 2025):**
+Proje takvimi ve gereksinimler tekrar gözden geçirildi. 
+Geliştirme sürecine (Faz 2 - Component yapısı) önümüzdeki hafta başlanması planlanıyor.
+Haftalık zorunlu commit eklendi.
