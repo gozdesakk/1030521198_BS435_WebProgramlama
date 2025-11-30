@@ -29,3 +29,11 @@ Zorunlu haftalık commit atandı.
 Proje takvimi ve gereksinimler tekrar gözden geçirildi. 
 Geliştirme sürecine (Faz 2 - Component yapısı) önümüzdeki hafta başlanması planlanıyor.
 Haftalık zorunlu commit eklendi.
+
+
+**Hafta (30 Kasım 2025):**
+Faz 2 (Component yapısı ve oyun mantığı) için ön hazırlıklar gözden geçirildi.
+Kodlama aşamasına önümüzdeki hafta başlanması planlanıyor.
+Haftalık zorunlu commit eklendi.
+
+
