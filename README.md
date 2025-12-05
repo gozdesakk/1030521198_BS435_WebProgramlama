@@ -14,26 +14,3 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-## Proje Günlüğü
-
-**Hafta (9 Kasım 2025):**
-Vize haftası nedeniyle Faz 2 kodlamasına ara verildi. 
-Bu haftalık zorunlu commit, proje planlaması olarak atılmaktadır.
-
-**Hafta (16 Kasım 2025):**
-Vize haftası devam ettiği için bu hafta da projeye ara verilmiştir.
-Zorunlu haftalık commit atandı.
-
-
-**Hafta (23 Kasım 2025):**
-Proje takvimi ve gereksinimler tekrar gözden geçirildi. 
-Geliştirme sürecine (Faz 2 - Component yapısı) önümüzdeki hafta başlanması planlanıyor.
-Haftalık zorunlu commit eklendi.
-
-
-**Hafta (30 Kasım 2025):**
-Faz 2 (Component yapısı ve oyun mantığı) için ön hazırlıklar gözden geçirildi.
-Kodlama aşamasına önümüzdeki hafta başlanması planlanıyor.
-Haftalık zorunlu commit eklendi.
-
-
