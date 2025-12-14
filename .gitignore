@@ -18,3 +18,13 @@ pnpm-debug.log*
 # IDEs and editors
 .vscode/
 .idea/
+*.vsidx
+/.vs
+/.vs
+/.vs
+/.vs
+/.vs/ai-image-game1/v17
+*.sqlite
+/.vs
+/.vs/ai-image-game1
+/.vs/ai-image-game1/v17

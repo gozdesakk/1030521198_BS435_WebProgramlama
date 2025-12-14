@@ -1,78 +1,109 @@
 ﻿import React, { useState } from 'react';
-import { questions } from '../questions'; // Soruları src klasöründen çekiyoruz
+import { questions } from '../questions'; // Soru havuzunu alıyoruz
 
-const GameScreen = ({ onFinish }) => {
-    // Şimdilik sadece 1. soruyu (index 0) alıyoruz
-    const currentQuestion = questions[0];
+const GameScreen = ({ onEndGame, mode }) => {
+    // 1. Seçilen moda ait soruları çekiyoruz (questions.nature veya questions.architecture)
+    const currentModeQuestions = questions[mode];
 
-    // İkinci şans hakkını kullandın mı?
-    const [isSecondChance, setIsSecondChance] = useState(false);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [score, setScore] = useState(0);
 
-    // Ekranda çıkacak uyarı mesajı (İpucu)
-    const [feedback, setFeedback] = useState("");
+    // İkinci şans ve ipucu state'leri
+    const [attempts, setAttempts] = useState(0);
+    const [showHint, setShowHint] = useState(false);
+    const [disabledOptions, setDisabledOptions] = useState([]);
 
-    // Resme tıklayınca ne olacak?
-    const handleOptionClick = (isAI) => {
-        // 1. Eğer doğru bildiyse (AI görselini seçtiyse)
+    // Güvenlik: Eğer o moda ait soru yoksa hata vermesin
+    if (!currentModeQuestions || currentModeQuestions.length === 0) {
+        return <div style={{ marginTop: '50px' }}>Bu modda henüz soru yok!</div>;
+    }
+
+    const currentQuestion = currentModeQuestions[currentQuestionIndex];
+
+    const handleOptionClick = (optionId, isAI) => {
+        if (disabledOptions.includes(optionId)) return; // Pasif şıkka tıklanamaz
+
         if (isAI) {
-            onFinish(true); // KAZANDIN mesajı yolla
-        }
-        // 2. Eğer yanlış bildiyse (Gerçek fotoyu seçtiyse)
-        else {
-            if (!isSecondChance) {
-                // İlk hatasıysa: İkinci şans ver ve ipucu göster
-                setIsSecondChance(true);
-                setFeedback(`⚠️ Yanlış! İpucu: ${currentQuestion.hint}`);
+            // --- DOĞRU CEVAP ---
+            let pointsEarned = 0;
+            if (attempts === 0) {
+                pointsEarned = 20;
+                alert("Tebrikler! İlk seferde bildin! 🎯");
             } else {
-                // İkinci hatasıysa: Oyunu bitir (KAYBETTİN)
-                onFinish(false);
+                pointsEarned = 10;
+                alert("Tebrikler! İkinci şansında bildin. 👍");
+            }
+            handleNextQuestion(score + pointsEarned);
+
+        } else {
+            // --- YANLIŞ CEVAP ---
+            if (attempts === 0) {
+                // İLK YANLIŞ: İpucu göster ve o şıkkı kapat
+                setAttempts(1);
+                setShowHint(true);
+                setDisabledOptions([...disabledOptions, optionId]);
+                alert(`Yanlış seçim! İpucu: ${currentQuestion.hint}`);
+            } else {
+                // İKİNCİ YANLIŞ: Puan yok, geç
+                alert("Maalesef bilemedin. Sıradaki soruya geçiliyor. 🤖");
+                handleNextQuestion(score);
             }
         }
     };
 
-    return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h2>{currentQuestion.question}</h2>
+    const handleNextQuestion = (newScore) => {
+        setScore(newScore);
 
-            {/* İpucu mesajı varsa göster */}
-            {feedback && (
-                <div style={{
-                    backgroundColor: '#fff3cd',
-                    color: '#856404',
-                    padding: '10px',
-                    margin: '10px auto',
-                    maxWidth: '600px',
-                    border: '1px solid #ffeeba',
-                    borderRadius: '5px'
-                }}>
-                    {feedback}
+        // Bir sonraki soru var mı?
+        if (currentQuestionIndex + 1 < currentModeQuestions.length) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            // State'leri sıfırla (yeni soru için)
+            setAttempts(0);
+            setShowHint(false);
+            setDisabledOptions([]);
+        } else {
+            // Oyun bitti
+            onEndGame(newScore);
+        }
+    };
+
+    return (
+        <div className="game-container" style={{ textAlign: 'center', padding: '20px' }}>
+            <h2>Mod: {mode === 'nature' ? '🌲 Doğa' : '🏛️ Mimari'}</h2>
+            <h3>Soru {currentQuestionIndex + 1} / {currentModeQuestions.length}</h3>
+            <p style={{ fontSize: '1.2rem', margin: '20px 0' }}>{currentQuestion.question}</p>
+
+            {/* İpucu Kutusu */}
+            {showHint && (
+                <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '5px', display: 'inline-block', marginBottom: '20px' }}>
+                    <strong>💡 İPUCU:</strong> {currentQuestion.hint}
                 </div>
             )}
 
-            {/* Resim Kutuları */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
-
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
                 {currentQuestion.options.map((option) => (
-                    <div key={option.id} onClick={() => handleOptionClick(option.isAI)}>
+                    <div
+                        key={option.id}
+                        onClick={() => handleOptionClick(option.id, option.isAI)}
+                        style={{
+                            opacity: disabledOptions.includes(option.id) ? 0.4 : 1,
+                            cursor: disabledOptions.includes(option.id) ? 'not-allowed' : 'pointer',
+                            border: '3px solid #ddd',
+                            borderRadius: '10px',
+                            overflow: 'hidden',
+                            transition: 'transform 0.2s'
+                        }}
+                    >
                         <img
                             src={option.src}
-                            alt="tahmin"
-                            style={{
-                                width: '250px',
-                                height: '250px',
-                                objectFit: 'cover',
-                                cursor: 'pointer',
-                                border: '4px solid #ddd',
-                                borderRadius: '10px'
-                            }}
-                            // Mouse üzerine gelince hafif büyüme efekti
-                            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            alt="Seçenek"
+                            style={{ width: '250px', height: '250px', objectFit: 'cover', display: 'block' }}
                         />
                     </div>
                 ))}
-
             </div>
+
+            <p style={{ marginTop: '20px', fontWeight: 'bold' }}>Puan: {score}</p>
         </div>
     );
 };

@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
 import './App.css';
 
 function App() {
-    const [gameState, setGameState] = useState('start');
-    const [isWin, setIsWin] = useState(false);
+    const [gameState, setGameState] = useState('start'); // start, playing, result
+    const [score, setScore] = useState(0);
+    const [gameMode, setGameMode] = useState('nature'); // Varsayılan mod
 
-    const startGame = () => {
+    // StartScreen'den gelen mod (selectedMode) burada yakalanır
+    const startGame = (selectedMode) => {
+        setGameMode(selectedMode);
+        setScore(0);
         setGameState('playing');
     };
 
-    const finishGame = (winStatus) => {
-        setIsWin(winStatus);
+    const finishGame = (finalScore) => {
+        setScore(finalScore);
         setGameState('result');
     };
 
@@ -23,9 +27,18 @@ function App() {
 
     return (
         <div className="App">
-            {gameState === 'start' && <StartScreen onStart={startGame} />}
-            {gameState === 'playing' && <GameScreen onFinish={finishGame} />}
-            {gameState === 'result' && <ResultScreen onRestart={restartGame} isWin={isWin} />}
+            {gameState === 'start' && (
+                <StartScreen onStart={startGame} />
+            )}
+
+            {gameState === 'playing' && (
+                // Seçilen modu (gameMode) GameScreen'e prop olarak gönderiyoruz
+                <GameScreen onEndGame={finishGame} mode={gameMode} />
+            )}
+
+            {gameState === 'result' && (
+                <ResultScreen score={score} onRestart={restartGame} />
+            )}
         </div>
     );
 }
