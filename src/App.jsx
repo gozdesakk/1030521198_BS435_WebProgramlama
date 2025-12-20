@@ -1,46 +1,59 @@
-﻿import React, { useState } from 'react';
-import StartScreen from './components/StartScreen';
-import GameScreen from './components/GameScreen';
-import ResultScreen from './components/ResultScreen';
-import './App.css';
+﻿
+// src/App.jsx
+import { useState } from 'react'
+import GameScreen from './components/GameScreen'
+import './App.css'
 
 function App() {
-    const [gameState, setGameState] = useState('start'); // start, playing, result
-    const [score, setScore] = useState(0);
-    const [gameMode, setGameMode] = useState('nature'); // Varsayılan mod
+  // Sadece oyunun başlayıp başlamadığını takip ediyoruz
+  const [gameStarted, setGameStarted] = useState(false);
 
-    // StartScreen'den gelen mod (selectedMode) burada yakalanır
-    const startGame = (selectedMode) => {
-        setGameMode(selectedMode);
-        setScore(0);
-        setGameState('playing');
-    };
+  // Oyun bitince çalışacak fonksiyon
+  const handleGameFinish = (score, totalScore) => {
+    alert(`🏁 Oyun Bitti! \nToplam Skorun: ${score} / ${totalScore}`);
+    setGameStarted(false); // Başlangıç ekranına dön
+  };
 
-    const finishGame = (finalScore) => {
-        setScore(finalScore);
-        setGameState('result');
-    };
+  return (
+    <div className="app-container">
+      
+      {/* DURUM 1: Oyun henüz başlamadıysa (Giriş Ekranı) */}
+      {!gameStarted ? (
+        <div className="welcome-screen" style={{ textAlign: 'center', marginTop: '100px' }}>
+          <h1>AI vs Gerçek: Görsel Avcısı 🕵️‍♂️</h1>
+          <p style={{ fontSize: '1.2rem', color: '#ccc' }}>
+            Yapay zekayı ayırt edebilir misin?
+          </p>
+          
+          <br />
 
-    const restartGame = () => {
-        setGameState('start');
-    };
-
-    return (
-        <div className="App">
-            {gameState === 'start' && (
-                <StartScreen onStart={startGame} />
-            )}
-
-            {gameState === 'playing' && (
-                // Seçilen modu (gameMode) GameScreen'e prop olarak gönderiyoruz
-                <GameScreen onEndGame={finishGame} mode={gameMode} />
-            )}
-
-            {gameState === 'result' && (
-                <ResultScreen score={score} onRestart={restartGame} />
-            )}
+          {/* Sadece BAŞLA butonu var. Mod seçimi içeride yapılacak. */}
+          <button 
+            className="start-btn" 
+            onClick={() => setGameStarted(true)}
+            style={{
+              padding: '20px 50px',
+              fontSize: '24px',
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 15px rgba(40, 167, 69, 0.4)'
+            }}
+          >
+            🚀 Oyuna Başla
+          </button>
         </div>
-    );
+      ) : (
+        /* DURUM 2: Başla'ya basıldıysa GameScreen'i yükle */
+        /* Mod seçimi artık GameScreen'in içinde yapılacak */
+        <GameScreen onFinish={handleGameFinish} />
+      )}
+
+    </div>
+  )
 }
 
-export default App;
+export default App

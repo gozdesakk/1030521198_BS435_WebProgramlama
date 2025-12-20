@@ -1,111 +1,159 @@
-﻿import React, { useState } from 'react';
-import { questions } from '../questions'; // Soru havuzunu alıyoruz
+﻿
+import { useState, useEffect } from 'react';
+import { questionCategories } from '../questions'; 
 
-const GameScreen = ({ onEndGame, mode }) => {
-    // 1. Seçilen moda ait soruları çekiyoruz (questions.nature veya questions.architecture)
-    const currentModeQuestions = questions[mode];
+export default function GameScreen({ onFinish }) {
+  // --- STATE'LER ---
+  const [selectedCategory, setSelectedCategory] = useState(null); 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  
+  // İpucu ve 2. Şans Mantığı
+  const [showHint, setShowHint] = useState(false);
+  const [disabledOptions, setDisabledOptions] = useState([]); 
+  const [attempts, setAttempts] = useState(0); 
 
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [score, setScore] = useState(0);
+  // Kategori seçildiyse soruları al
+  const questions = selectedCategory ? questionCategories[selectedCategory] : [];
+  const currentQuestion = questions[currentQuestionIndex];
 
-    // İkinci şans ve ipucu state'leri
-    const [attempts, setAttempts] = useState(0);
-    const [showHint, setShowHint] = useState(false);
-    const [disabledOptions, setDisabledOptions] = useState([]);
+  // --- OYUN FONKSİYONLARI ---
+  const handleOptionClick = (optionId, isAI) => {
+    // Eğer bu şık pasifse tıklama
+    if (disabledOptions.includes(optionId)) return;
 
-    // Güvenlik: Eğer o moda ait soru yoksa hata vermesin
-    if (!currentModeQuestions || currentModeQuestions.length === 0) {
-        return <div style={{ marginTop: '50px' }}>Bu modda henüz soru yok!</div>;
+    if (isAI) {
+      // --- ✅ DOĞRU CEVAP ---
+      let pointsToAdd = 20; 
+      if (attempts === 1) pointsToAdd = 10; 
+      
+      const newScore = score + pointsToAdd;
+      setScore(newScore);
+      
+      // Mesajı göster ve bitir
+      setTimeout(() => {
+        alert("🎉 Tebrikler! Doğru bildiniz.");
+        goNextQuestion(newScore);
+      }, 100);
+
+    } else {
+      // --- ❌ YANLIŞ CEVAP ---
+      if (attempts === 0) {
+        // İLK HATA: İpucu ver
+        setAttempts(1);
+        setShowHint(true);
+        setDisabledOptions([...disabledOptions, optionId]); 
+      } else {
+        // İKİNCİ HATA: Kaybettin (Mesaj sadeleştirildi)
+        setTimeout(() => {
+            alert("😔 Maalesef bilemedin.");
+            goNextQuestion(score);
+        }, 100);
+      }
     }
+  };
 
-    const currentQuestion = currentModeQuestions[currentQuestionIndex];
+  const goNextQuestion = (currentScore) => {
+    // Temizlik yap
+    setShowHint(false);
+    setDisabledOptions([]);
+    setAttempts(0);
 
-    const handleOptionClick = (optionId, isAI) => {
-        if (disabledOptions.includes(optionId)) return; // Pasif şıkka tıklanamaz
+    // Soru bitti mi kontrol et
+    if (currentQuestionIndex + 1 < questions.length) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // Oyun Bitti -> Skoru gönder
+      onFinish(currentScore, questions.length * 20);
+    }
+  };
 
-        if (isAI) {
-            // --- DOĞRU CEVAP ---
-            let pointsEarned = 0;
-            if (attempts === 0) {
-                pointsEarned = 20;
-                alert("Tebrikler! İlk seferde bildin! 🎯");
-            } else {
-                pointsEarned = 10;
-                alert("Tebrikler! İkinci şansında bildin. 👍");
-            }
-            handleNextQuestion(score + pointsEarned);
-
-        } else {
-            // --- YANLIŞ CEVAP ---
-            if (attempts === 0) {
-                // İLK YANLIŞ: İpucu göster ve o şıkkı kapat
-                setAttempts(1);
-                setShowHint(true);
-                setDisabledOptions([...disabledOptions, optionId]);
-                alert(`Yanlış seçim! İpucu: ${currentQuestion.hint}`);
-            } else {
-                // İKİNCİ YANLIŞ: Puan yok, geç
-                alert("Maalesef bilemedin. Sıradaki soruya geçiliyor. 🤖");
-                handleNextQuestion(score);
-            }
-        }
-    };
-
-    const handleNextQuestion = (newScore) => {
-        setScore(newScore);
-
-        // Bir sonraki soru var mı?
-        if (currentQuestionIndex + 1 < currentModeQuestions.length) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-            // State'leri sıfırla (yeni soru için)
-            setAttempts(0);
-            setShowHint(false);
-            setDisabledOptions([]);
-        } else {
-            // Oyun bitti
-            onEndGame(newScore);
-        }
-    };
-
+  // --- EKRAN 1: MOD SEÇİMİ ---
+  if (!selectedCategory) {
     return (
-        <div className="game-container" style={{ textAlign: 'center', padding: '20px' }}>
-            <h2>Mod: {mode === 'nature' ? '🌲 Doğa' : '🏛️ Mimari'}</h2>
-            <h3>Soru {currentQuestionIndex + 1} / {currentModeQuestions.length}</h3>
-            <p style={{ fontSize: '1.2rem', margin: '20px 0' }}>{currentQuestion.question}</p>
-
-            {/* İpucu Kutusu */}
-            {showHint && (
-                <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '5px', display: 'inline-block', marginBottom: '20px' }}>
-                    <strong>💡 İPUCU:</strong> {currentQuestion.hint}
-                </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                {currentQuestion.options.map((option) => (
-                    <div
-                        key={option.id}
-                        onClick={() => handleOptionClick(option.id, option.isAI)}
-                        style={{
-                            opacity: disabledOptions.includes(option.id) ? 0.4 : 1,
-                            cursor: disabledOptions.includes(option.id) ? 'not-allowed' : 'pointer',
-                            border: '3px solid #ddd',
-                            borderRadius: '10px',
-                            overflow: 'hidden',
-                            transition: 'transform 0.2s'
-                        }}
-                    >
-                        <img
-                            src={option.src}
-                            alt="Seçenek"
-                            style={{ width: '250px', height: '250px', objectFit: 'cover', display: 'block' }}
-                        />
-                    </div>
-                ))}
-            </div>
-
-            <p style={{ marginTop: '20px', fontWeight: 'bold' }}>Puan: {score}</p>
+      <div className="game-container" style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h2>Oyun Modunu Seç</h2>
+        <p>Lütfen oynamak istediğin kategoriyi seç:</p>
+        
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '30px' }}>
+          <button 
+            onClick={() => setSelectedCategory('nature')}
+            style={modeButtonStyle}>
+            🌲 Doğa Modu
+          </button>
+          
+          <button 
+            onClick={() => setSelectedCategory('architecture')}
+            style={{ ...modeButtonStyle, backgroundColor: '#ff9800' }}>
+            🏛️ Mimari Modu
+          </button>
         </div>
+      </div>
     );
-};
+  }
 
-export default GameScreen;
+  // --- EKRAN 2: SORU EKRANI ---
+  return (
+    <div className="game-container" style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+      <div className="header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+        <span style={{ fontWeight: 'bold' }}>Mod: {selectedCategory === 'nature' ? 'Doğa' : 'Mimari'}</span>
+        <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>Puan: {score}</span>
+      </div>
+
+      <h3 style={{ marginBottom: '20px' }}>{currentQuestion.question}</h3>
+
+      {/* İPUCU ALANI */}
+      {showHint && (
+        <div style={{ 
+          backgroundColor: '#fff3cd', 
+          padding: '15px', 
+          borderRadius: '8px', 
+          marginBottom: '20px', 
+          border: '1px solid #ffeeba',
+          color: '#856404' 
+        }}>
+          <strong>💡 İPUCU:</strong> {currentQuestion.hint} <br/>
+          <small>(Bir yanlış yaptın, kalan şıklardan tekrar dene!)</small>
+        </div>
+      )}
+
+      {/* ŞIKLAR */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        {currentQuestion.options.map((option) => (
+          <div 
+            key={option.id} 
+            onClick={() => handleOptionClick(option.id, option.isAI)}
+            style={{
+              opacity: disabledOptions.includes(option.id) ? 0.4 : 1, 
+              pointerEvents: disabledOptions.includes(option.id) ? 'none' : 'auto', 
+              cursor: 'pointer',
+              border: '4px solid #ddd',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              transition: 'transform 0.2s'
+            }}
+            onMouseOver={(e) => !disabledOptions.includes(option.id) && (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <img 
+              src={option.src} 
+              alt="seçenek" 
+              style={{ width: '200px', height: '200px', objectFit: 'cover', display: 'block' }} 
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const modeButtonStyle = {
+  padding: '20px 40px', 
+  fontSize: '18px', 
+  cursor: 'pointer', 
+  backgroundColor: '#4CAF50', 
+  color: 'white', 
+  border: 'none', 
+  borderRadius: '8px',
+  fontWeight: 'bold'
+};
