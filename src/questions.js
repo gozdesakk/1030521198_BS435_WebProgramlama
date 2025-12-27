@@ -28,5 +28,20 @@ export const questionCategories = {
         { id: 'a1_opt3', src: '/image/arch-real2.jpg', isAI: false }
       ]
     }
+  ],
+ 
+
+  // --- MOD 3: PORTRE ---
+  portrait: [
+    {
+      id: 201,
+      question: "Bu yüzlerden hangisi bir insana ait değildir (AI Üretimi)?",
+      hint: "Göz bebeklerinin şekline, dişlere veya kulak detaylarına dikkat et. AI genelde simetriyi kaçırır.",
+      options: [
+        { id: 'p1_opt1', src: '/image/face-real1.jpg', isAI: false },
+        { id: 'p1_opt2', src: '/image/face-ai.jpg', isAI: true }, // Doğru Cevap (AI)
+        { id: 'p1_opt3', src: '/image/face-real2.jpg', isAI: false }
+      ]
+    }
   ]
-};
+}

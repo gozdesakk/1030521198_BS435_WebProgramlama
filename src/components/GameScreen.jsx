@@ -69,28 +69,39 @@ export default function GameScreen({ onFinish }) {
   };
 
   // --- EKRAN 1: MOD SEÇİMİ ---
+
   if (!selectedCategory) {
     return (
       <div className="game-container" style={{ textAlign: 'center', marginTop: '50px' }}>
         <h2>Oyun Modunu Seç</h2>
         <p>Lütfen oynamak istediğin kategoriyi seç:</p>
         
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '30px' }}>
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '30px', flexWrap: 'wrap' }}>
+          {/* 1. Doğa Modu */}
           <button 
             onClick={() => setSelectedCategory('nature')}
             style={modeButtonStyle}>
             🌲 Doğa Modu
           </button>
           
+          {/* 2. Mimari Modu */}
           <button 
             onClick={() => setSelectedCategory('architecture')}
             style={{ ...modeButtonStyle, backgroundColor: '#ff9800' }}>
             🏛️ Mimari Modu
           </button>
+
+          {/* 3. YENİ: Portre Modu (Mor Buton) */}
+          <button 
+            onClick={() => setSelectedCategory('portrait')}
+            style={{ ...modeButtonStyle, backgroundColor: '#9C27B0' }}>
+            👩👨 Portre Modu
+          </button>
         </div>
       </div>
     );
   }
+  
 
   // --- EKRAN 2: SORU EKRANI ---
   return (
