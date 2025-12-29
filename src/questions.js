@@ -43,5 +43,20 @@ export const questionCategories = {
         { id: 'p1_opt3', src: '/image/face-real2.jpg', isAI: false }
       ]
     }
+  ],
+  
+
+  // --- MOD 4: YEMEK (GURME) ---
+  food: [
+    {
+      id: 301,
+      question: "Hangi yemek fotoğrafı Yapay Zeka (AI) tarafından üretilmiştir?",
+      hint: "Yiyeceklerin dokusuna ve parlaklığına bak. AI genelde malzemeleri aşırı pürüzsüz ve kusursuz yapar.",
+      options: [
+        { id: 'f1_opt1', src: '/image/food-real1.jpg', isAI: false },
+        { id: 'f1_opt2', src: '/image/food-ai.jpg', isAI: true }, // Doğru Cevap (AI)
+        { id: 'f1_opt3', src: '/image/food-real2.jpg', isAI: false }
+      ]
+    }
   ]
 }

@@ -97,6 +97,15 @@ export default function GameScreen({ onFinish }) {
             style={{ ...modeButtonStyle, backgroundColor: '#9C27B0' }}>
             👩👨 Portre Modu
           </button>
+
+          {/* 4. YENİ: Yemek Modu (Kırmızı/Pembe Buton) */}
+          <button 
+            onClick={() => setSelectedCategory('food')}
+            style={{ ...modeButtonStyle, backgroundColor: '#e91e63' }}> 
+            🍔 Gurme Modu
+          </button>
+
+
         </div>
       </div>
     );
